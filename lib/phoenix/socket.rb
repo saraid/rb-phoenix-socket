@@ -69,7 +69,7 @@ module Phoenix
 
     def log(msg)
       return unless @verbose
-      puts "[#{Thread.current[:id]}] #{msg} (#@topic_joined)"
+      $stderr.puts "[#{Thread.current[:id]}] #{msg} (#@topic_joined)"
     end
 
     def ensure_connection

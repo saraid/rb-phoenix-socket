@@ -53,6 +53,16 @@ module Phoenix
       end
     end
 
+    def reply_from_join
+      @join_reply ||=
+        synchronize do
+          ensure_connection
+          @topic_cond.wait_until { @topic_joined }
+
+          inbox.delete(:join)
+        end
+    end
+
     def join_options
       return @join_options unless join_options_proc
       join_options_proc.call(@join_options)
@@ -115,6 +125,10 @@ module Phoenix
           inbox_cond.broadcast
         elsif data['ref'] == @join_ref
           log ['join_ref', @join_ref]
+
+          inbox[:join] = data
+          inbox_cond.broadcast
+
           @topic_joined = true
           @topic_cond.broadcast
         else
